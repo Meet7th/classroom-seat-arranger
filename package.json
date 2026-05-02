@@ -1,0 +1,13 @@
+{
+  "name": "seatwise",
+  "version": "6.0.0",
+  "description": "教室座位智能编排系统 - Classroom Seat Arrangement System",
+  "main": "index.html",
+  "scripts": {
+    "serve": "npx serve .",
+    "build": "node scripts/build.js"
+  },
+  "keywords": ["classroom", "seat-arrangement", "education"],
+  "author": "",
+  "license": "MIT"
+}
