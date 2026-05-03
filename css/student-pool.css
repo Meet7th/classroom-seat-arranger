@@ -1,0 +1,14 @@
+/* ==================== Student Pool ==================== */
+        .pool-search { display:flex; gap:6px; margin-bottom:8px; }
+        .pool-search input { flex:1; padding:8px 12px; border:1px solid var(--seat-border); border-radius:var(--radius-pill); background:var(--bg-secondary); color:var(--text-primary); font-size:13px; transition:var(--transition); }
+        .pool-search input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(0,122,255,0.15); }
+        .pool-filters { display:flex; gap:4px; margin-bottom:8px; flex-wrap:wrap; }
+        .pool-filter { padding:4px 10px; border-radius:var(--radius-pill); font-size:11px; font-weight:600; border:1px solid var(--seat-border); background:var(--bg-secondary); color:var(--text-secondary); cursor:pointer; transition:var(--transition); }
+        .pool-filter.active { background:var(--primary); color:white; border-color:var(--primary); }
+        .pool-list { max-height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; }
+        .pool-item { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--bg-secondary); border:1px solid var(--seat-border); border-radius:var(--radius-sm); font-size:13px; cursor:grab; transition:var(--transition); }
+        .pool-item:hover { box-shadow:var(--shadow-sm); transform:translateY(-1px); }
+        .pool-item:active { cursor:grabbing; }
+        .pool-item-name { font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+        .pool-item-meta { font-size:11px; color:var(--text-tertiary); display:flex; gap:6px; align-items:center; }
+        .pool-empty { text-align:center; color:var(--text-tertiary); padding:20px; font-size:13px; }

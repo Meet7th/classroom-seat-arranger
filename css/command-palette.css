@@ -1,0 +1,12 @@
+/* ==================== Smart Search Dropdown ==================== */
+        .smart-search { position:relative; }
+        .smart-search-input { width:100%; padding:8px 12px; border:1px solid var(--seat-border); border-radius:var(--radius-sm); background:var(--bg-secondary); color:var(--text-primary); font-size:13px; transition:var(--transition); }
+        .smart-search-input:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(0,122,255,0.15); }
+        .smart-search-input::placeholder { color:var(--text-tertiary); }
+        .smart-search-dropdown { position:fixed; background:var(--bg-secondary); border:1px solid var(--seat-border); border-radius:var(--radius-sm); box-shadow:var(--shadow-lg); z-index:9999; max-height:180px; overflow-y:auto; display:none; }
+        .smart-search-dropdown.open { display:block; }
+        .smart-search-item { padding:8px 12px; cursor:pointer; font-size:13px; display:flex; justify-content:space-between; align-items:center; transition:background 0.15s; }
+        .smart-search-item:hover,.smart-search-item.highlighted { background:rgba(0,122,255,0.08); }
+        .smart-search-item .match-hint { font-size:10px; color:var(--text-tertiary); }
+        .smart-search-item.disabled { opacity:0.4; cursor:not-allowed; }
+        .smart-search-empty { padding:10px 12px; font-size:12px; color:var(--text-tertiary); text-align:center; }
