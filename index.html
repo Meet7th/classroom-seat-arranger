@@ -2,30 +2,13 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>教室座位智能编排系统 v6.0</title>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.26.0/dist/index.js"></script>
-    <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/seat.css">
-    <link rel="stylesheet" href="css/modal.css">
-    <link rel="stylesheet" href="css/panels.css">
-    <link rel="stylesheet" href="css/toast.css">
-    <link rel="stylesheet" href="css/context-menu.css">
-    <link rel="stylesheet" href="css/student-pool.css">
-    <link rel="stylesheet" href="css/stats.css">
-    <link rel="stylesheet" href="css/guide.css">
-    <link rel="stylesheet" href="css/plugins.css">
-    <link rel="stylesheet" href="css/command-palette.css">
-    <link rel="stylesheet" href="css/demo.css">
-    <link rel="stylesheet" href="css/advanced.css">
-    <link rel="stylesheet" href="css/responsive.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/pinyin-pro@3.26.0/dist/index.js" defer></script>
+    <link rel="stylesheet" href="css/main.css">
 </head>
-<body>
 <body>
     <!-- Toast -->
     <div class="toast-container" id="toastContainer"></div>
@@ -46,11 +29,13 @@
             <button class="side-panel-tab active" data-sptab="probability">🔮 概率</button>
             <button class="side-panel-tab" data-sptab="recommend">🧠 推荐</button>
             <button class="side-panel-tab" data-sptab="stats">📊 统计</button>
+            <button class="side-panel-tab" data-sptab="relationships">🔗 关系</button>
         </div>
         <div class="side-panel-body" id="sidePanelBody">
             <div id="sp-probability" class="tab-content active"><div id="spProbContent"></div></div>
             <div id="sp-recommend" class="tab-content"><div id="spRecommendContent"></div></div>
             <div id="sp-stats" class="tab-content"><div id="spStatsContent"></div></div>
+            <div id="sp-relationships" class="tab-content"><div id="spRelationshipsContent"></div></div>
         </div>
     </div>
     <!-- [FEATURE #11] More menu -->
@@ -441,11 +426,12 @@
                 </div>
                 <div class="adv-export-grid" id="advExportGrid">
                     <label class="adv-export-item checked"><input type="checkbox" data-module="students" checked> 👥 学生名单</label>
-                    <label class="adv-export-item checked"><input type="checkbox" data-module="bwlists" checked> 📋 黑白名单 & 关系网</label>
+                    <label class="adv-export-item checked"><input type="checkbox" data-module="bwlists" checked> 📋 黑白名单（含概率设置）</label>
                     <label class="adv-export-item checked"><input type="checkbox" data-module="seats" checked> 🪑 当前座位分配</label>
                     <label class="adv-export-item checked"><input type="checkbox" data-module="settings" checked> ⚙️ 系统设置</label>
                     <label class="adv-export-item checked"><input type="checkbox" data-module="plugins" checked> 🔌 插件列表及配置</label>
                     <label class="adv-export-item checked"><input type="checkbox" data-module="history" checked> 📋 操作历史</label>
+                    <label class="adv-export-item checked"><input type="checkbox" data-module="relationships" checked> 🔗 关系网络</label>
                     <label class="adv-export-item checked"><input type="checkbox" data-module="theme" checked> 🎨 主题与外观设定</label>
                     <label class="adv-export-item checked"><input type="checkbox" data-module="demo" checked> 🎬 演示序列（若已配置）</label>
                 </div>
@@ -489,6 +475,52 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary" id="cancelImportDisplayOption">取消</button>
                 <button class="btn btn-primary" id="confirmImportDisplayOption">✅ 确认导入</button>
+            </div>
+        </div>
+    </div>
+    <!-- Relationship Management Modal -->
+    <div class="modal-overlay" id="relationshipModal">
+        <div class="modal" style="max-width:640px;">
+            <div class="modal-header"><h3 class="modal-title">🔗 关系网络管理</h3><button class="modal-close" id="closeRelationshipModal" aria-label="关闭">×</button></div>
+            <div class="modal-content">
+                <div class="rel-form" id="relForm">
+                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+                        <input class="form-input rel-student-search" id="relStudent1Input" placeholder="搜索学生 A…" style="flex:1;min-width:120px;">
+                        <span style="color:var(--text-secondary);font-size:13px;">与</span>
+                        <input class="form-input rel-student-search" id="relStudent2Input" placeholder="搜索学生 B…" style="flex:1;min-width:120px;">
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <select class="form-input" id="relTypeSelect" style="flex:1;min-width:100px;"></select>
+                        <div style="display:flex;align-items:center;gap:4px;flex:1;min-width:120px;">
+                            <input type="range" id="relScoreSlider" min="-100" max="100" value="0" style="flex:1;">
+                            <input class="form-input" id="relScoreInput" type="number" min="-999" max="999" value="0" style="width:70px;text-align:center;">
+                        </div>
+                        <button class="btn btn-primary btn-sm" id="relSaveBtn">💾 保存</button>
+                    </div>
+                    <div id="relStudent1Id" style="display:none;"></div>
+                    <div id="relStudent2Id" style="display:none;"></div>
+                    <div id="relEditId" style="display:none;"></div>
+                </div>
+                <div class="rel-filter-bar">
+                    <input class="form-input" id="relSearchInput" placeholder="🔍 搜索学生姓名…" style="flex:1;min-width:100px;">
+                    <select class="form-input" id="relTypeFilter" style="width:120px;">
+                        <option value="all">全部类型</option>
+                    </select>
+                    <select class="form-input" id="relSignFilter" style="width:100px;">
+                        <option value="all">全部</option>
+                        <option value="positive">正向关系</option>
+                        <option value="negative">负向关系</option>
+                    </select>
+                </div>
+                <div class="rel-grid" id="relGrid"></div>
+            </div>
+            <div class="modal-footer" style="justify-content:space-between;">
+                <div>
+                    <button class="btn btn-ghost btn-sm" id="relExportBtn">📤 导出 JSON</button>
+                    <button class="btn btn-ghost btn-sm" id="relImportBtn">📥 导入 JSON</button>
+                    <button class="btn btn-danger btn-sm" id="relClearAllBtn">🗑️ 清空所有</button>
+                </div>
+                <button class="btn btn-secondary" id="closeRelationshipModalBtn">关闭</button>
             </div>
         </div>
     </div>
@@ -620,9 +652,9 @@ AlgorithmRegistry.register(CustomAlgorithm);</div>
                 <div class="tab-content active" id="tab-guide">
                     <div class="guide-section"><h4>📋 功能索引</h4>
                         <div style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;">
-                            <button class="btn btn-ghost btn-sm" onclick="document.querySelector('#helpTabBar .tab-btn[data-tab=algorithm]').click()">🧮 运行逻辑</button>
-                            <button class="btn btn-ghost btn-sm" onclick="document.querySelector('#helpTabBar .tab-btn[data-tab=ai-algo]').click()">🧬 AI算法开发</button>
-                            <button class="btn btn-ghost btn-sm" onclick="document.querySelector('#helpTabBar .tab-btn[data-tab=plugins]').click()">🔌 插件开发</button>
+                            <button class="btn btn-ghost btn-sm" id="guideGoAlgorithm">🧮 运行逻辑</button>
+                            <button class="btn btn-ghost btn-sm" id="guideGoAiAlgo">🧬 AI算法开发</button>
+                            <button class="btn btn-ghost btn-sm" id="guideGoPlugins">🔌 插件开发</button>
                         </div>
                     </div>
                     <div class="guide-section"><h4>🚀 3步开始</h4><ol class="guide-list">
@@ -632,9 +664,9 @@ AlgorithmRegistry.register(CustomAlgorithm);</div>
                     </ol>
                     <div class="btn-group" style="margin-top:8px;">
                         <button class="btn btn-secondary btn-sm" id="guideTryFillExample">🎯 试一试：填入示例学生</button>
-                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('settingsModal').classList.add('active'); document.querySelector('[data-stab=layout]').click()">🎯 试一试：设置布局</button>
-                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('helpModal').classList.remove('active'); document.getElementById('mmPodium')?.click()">🎯 试一试：切换讲台视角</button>
-                        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('helpModal').classList.remove('active'); document.getElementById('mmHeatmap')?.click()">🎯 试一试：热力图</button>
+                        <button class="btn btn-secondary btn-sm" id="guideTryLayout">🎯 试一试：设置布局</button>
+                        <button class="btn btn-secondary btn-sm" id="guideTryPodium">🎯 试一试：切换讲台视角</button>
+                        <button class="btn btn-secondary btn-sm" id="guideTryHeatmap">🎯 试一试：热力图</button>
                     </div>
                     </div>
                     <div class="guide-section"><h4>🧠 智能推荐 & 自定义算法</h4><ul class="guide-list">
@@ -711,7 +743,7 @@ AlgorithmRegistry.register(CustomAlgorithm);</div>
                         <ul class="guide-list">
                             <li>Excel 导入时，系统会自动匹配表头中的科目名称（如"语文""数学"）</li>
                             <li>如果 Excel 没有表头，按默认列顺序解析：姓名、性别、午休、各科成绩…</li>
-                            <li>成绩范围 0-100，超出范围会自动修正</li>
+                            <li>成绩范围按科目满分自动修正（可在"导入学生→科目管理"中设置各科满分）</li>
                             <li>性格支持：外向、内向、中性</li>
                             <li>职务支持：班长、副班长、学习委员、体育委员、文艺委员、劳动委员、小组长、课代表</li>
                         </ul>
@@ -881,7 +913,6 @@ PluginManager.register('my-plugin', MyPlugin);</div>
                 <button class="sidebar-tab active" data-tab="search"><span class="tab-icon">🔍</span><span class="tab-label">搜索</span></button>
                 <button class="sidebar-tab" data-tab="students"><span class="tab-icon">👥</span><span class="tab-label">学生池</span></button>
                 <button class="sidebar-tab" data-tab="lists"><span class="tab-icon">📋</span><span class="tab-label">名单</span></button>
-                <button class="sidebar-tab" data-tab="relations"><span class="tab-icon">🕸️</span><span class="tab-label">关系</span></button>
             </div>
             <div class="sidebar-content">
                 <!-- [FEATURE #10] Panel: Full Search (always visible at top) -->
@@ -1044,77 +1075,6 @@ PluginManager.register('my-plugin', MyPlugin);</div>
                         </div></div>
                     </div>
                 </div>
-
-                <!-- Panel: Relationship Network -->
-                <div class="tab-pane" id="pane-relations">
-                    <div class="glass-panel" id="relAddPanel">
-                        <div class="panel-header">
-                            <div class="panel-header-left"><span class="panel-icon">➕</span><div class="panel-title-group"><span class="panel-title">添加关系</span><span class="panel-subtitle">定义学生之间的关系与影响分数</span></div></div>
-                            <span class="panel-toggle">▼</span>
-                        </div>
-                        <div class="panel-content"><div class="panel-content-inner">
-                            <div class="form-group">
-                                <label class="form-label">关系类型</label>
-                                <div class="rel-type-grid" id="relTypeGrid"></div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">学生 A</label>
-                                <div class="smart-search">
-                                    <input type="text" class="smart-search-input" id="relStudentA" placeholder="搜索学生姓名...">
-                                    <div class="smart-search-dropdown" id="relStudentADropdown"></div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">学生 B</label>
-                                <div class="smart-search">
-                                    <input type="text" class="smart-search-input" id="relStudentB" placeholder="搜索学生姓名...">
-                                    <div class="smart-search-dropdown" id="relStudentBDropdown"></div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">影响分数 <span id="relScoreLabel" style="font-weight:700;color:var(--primary);">0</span></label>
-                                <div class="rel-score-slider">
-                                    <span style="font-size:11px;color:var(--danger);">-100</span>
-                                    <input type="range" id="relScoreSlider" min="-100" max="100" value="0" step="5">
-                                    <span style="font-size:11px;color:var(--success);">+100</span>
-                                </div>
-                                <span class="form-hint">正分 = 应坐在一起 | 负分 = 应分开 | 分数无上下限（拖动滑块后可手动输入更大值）</span>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">备注 (可选)</label>
-                                <input type="text" class="form-input" id="relNote" placeholder="例如：同桌互助、性格冲突...">
-                            </div>
-                            <div class="btn-group">
-                                <button class="btn btn-primary" id="relAddBtn">➕ 添加关系</button>
-                                <button class="btn btn-ghost btn-sm" id="relClearForm">清空</button>
-                            </div>
-                        </div></div>
-                    </div>
-
-                    <div class="glass-panel" id="relListPanel">
-                        <div class="panel-header">
-                            <div class="panel-header-left"><span class="panel-icon">🕸️</span><div class="panel-title-group"><span class="panel-title">关系网</span><span class="panel-subtitle" id="relSubtitle">0 条关系</span></div></div>
-                            <span class="panel-toggle">▼</span>
-                        </div>
-                        <div class="panel-content"><div class="panel-content-inner">
-                            <div class="pool-search">
-                                <input type="text" id="relSearch" placeholder="🔍 搜索学生名或关系类型...">
-                            </div>
-                            <div class="rel-filter-bar" id="relFilterBar">
-                                <button class="rel-filter active" data-filter="all">全部</button>
-                                <button class="rel-filter" data-filter="positive">🟢 正向</button>
-                                <button class="rel-filter" data-filter="negative">🔴 负向</button>
-                            </div>
-                            <div id="relList"><div class="rel-empty">暂无关系定义</div></div>
-                            <div class="btn-group" style="margin-top:8px;">
-                                <button class="btn btn-secondary btn-sm" id="relExportBtn">📤 导出</button>
-                                <button class="btn btn-secondary btn-sm" id="relImportBtn">📥 导入</button>
-                                <button class="btn btn-danger btn-sm" id="relClearAllBtn">🗑️ 清空全部</button>
-                                <input type="file" id="relImportFile" accept=".json" style="display:none;">
-                            </div>
-                        </div></div>
-                    </div>
-                </div>
             </div> <!-- end sidebar-content -->
         </div> <!-- end sidebar -->
 
@@ -1130,8 +1090,6 @@ PluginManager.register('my-plugin', MyPlugin);</div>
                     <button class="btn btn-secondary" id="undoBtn" title="撤销 (Ctrl+Z)">↩️</button>
                     <button class="btn btn-secondary" id="redoBtn" title="重做 (Ctrl+Y)">↪️</button>
                 </div>
-                <div class="door front-door" id="frontDoor" role="status" aria-label="前门标识">前门</div>
-                <div class="door back-door" id="backDoor" role="status" aria-label="后门标识">后门</div>
                 <div class="quick-info" id="quickInfo">
                     <span class="qi-item" data-qi="layout">📐 <span id="qiLayout">7×11</span></span>
                     <span class="qi-divider"></span>
@@ -1155,6 +1113,8 @@ PluginManager.register('my-plugin', MyPlugin);</div>
                     <button class="btn btn-sm btn-ghost" id="batchCancel">取消</button>
                 </div>
                 <div class="classroom" id="classroom">
+                    <div class="door front-door" id="frontDoor" role="status" aria-label="前门标识"><span class="door-label">🚪 前门</span></div>
+                    <div class="door back-door" id="backDoor" role="status" aria-label="后门标识"><span class="door-label">🚪 后门</span></div>
                     <div class="platform-area" id="platformArea">
                         <div class="platform-side-seat" id="platformLeft" data-type="platform-left">
                             <span class="seat-number">讲台左</span><span class="seat-name"></span>
@@ -1211,9 +1171,11 @@ PluginManager.register('my-plugin', MyPlugin);</div>
                 </div>
                 <div style="position:relative;display:inline-flex;">
                     <button class="btn btn-secondary" id="viewMenuBtn" aria-label="视图选项">👁️ 视图 ▾</button>
-                    <div id="viewDropdown" style="display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:4px;background:var(--glass-bg-heavy);backdrop-filter:blur(40px);border:1px solid var(--glass-border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:4px;z-index:100;min-width:140px;">
+                    <div id="viewDropdown" style="display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:4px;background:var(--glass-bg-heavy);backdrop-filter:blur(40px);border:1px solid var(--glass-border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:4px;z-index:100;min-width:160px;">
                         <div class="context-menu-item" id="toggleHeatmap">🔥 热力图</div>
                         <div class="context-menu-item" id="viewStats">📊 统计</div>
+                        <div style="height:1px;background:var(--glass-border);margin:4px 0;"></div>
+                        <div class="context-menu-item" id="viewTogglePerspective">🎓 讲台视角</div>
                     </div>
                 </div>
                 <div style="position:relative;display:inline-flex;">
@@ -1232,25 +1194,12 @@ PluginManager.register('my-plugin', MyPlugin);</div>
     </div>
     <!-- Saved Indicator -->
     <div class="saved-indicator" id="savedIndicator"><span class="dot"></span><span>已保存</span></div>
-    <script src="js/01-utils.js"></script>
-    <script src="js/02-state.js"></script>
-    <script src="js/03-toast.js"></script>
-    <script src="js/04-plugins.js"></script>
-    <script src="js/05-modules.js"></script>
-    <script src="js/06-security.js"></script>
-    <script src="js/07-algorithms.js"></script>
-    <!-- UI modules (load before ui-delegate.js) -->
-    <script src="js/ui/ui-renderer.js"></script>
-    <script src="js/ui/ui-seats.js"></script>
-    <script src="js/ui/ui-draw.js"></script>
-    <script src="js/ui/ui-heatmap.js"></script>
-    <script src="js/ui/ui-student.js"></script>
-    <script src="js/ui/ui-recommend.js"></script>
-    <script src="js/ui/ui-montecarlo.js"></script>
-    <script src="js/ui/ui-settings.js"></script>
-    <script src="js/ui/ui-features.js"></script>
-    <script src="js/ui/ui-events.js"></script>
-    <script src="js/ui/ui-delegate.js"></script>
-    <script src="js/09-init.js"></script>
+<script src="js/config.js" defer></script>
+<script src="js/utils.js" defer></script>
+<script src="js/modules.js" defer></script>
+<script src="js/analysis.js" defer></script>
+<script src="js/algorithm.js" defer></script>
+<script src="js/ui.js" defer></script>
+<script src="js/app.js" defer></script>
 </body>
 </html>
