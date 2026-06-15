@@ -153,3 +153,6 @@ AlgorithmRegistry.register(MyAlgorithm);
 ## 更新日志
 
 详见 [CHANGELOG.md](CHANGELOG.md)
+
+## 立即尝试
+https://meet7th.github.io/classroom-seat-arranger/
