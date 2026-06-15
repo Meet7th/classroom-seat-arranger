@@ -41,7 +41,7 @@ const AdvExportImport = {
 
     /** Build export data based on selected modules */
     buildExportData(selectedModules) {
-        const data = { _version: '6.0', _exportedAt: new Date().toISOString(), _modules: selectedModules };
+        const data = { _version: '26.6.16', _exportedAt: new Date().toISOString(), _modules: selectedModules };
         if (selectedModules.includes('students')) {
             data.students = state.students;
         }
@@ -560,11 +560,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window._startTime = Date.now();
 
     // Register core modules
-    ModuleRegistry.register({ id: 'core-state', name: '状态管理', version: '6.0.0', type: 'core', description: '全局状态管理与数据持久化', init() {}, destroy() {} });
-    ModuleRegistry.register({ id: 'core-algorithm', name: '抽取算法', version: '6.0.0', type: 'core', description: '概率计算与座位分配算法', init() {}, destroy() {} });
+    ModuleRegistry.register({ id: 'core-state', name: '状态管理', version: '26.6.16', type: 'core', description: '全局状态管理与数据持久化', init() {}, destroy() {} });
+    ModuleRegistry.register({ id: 'core-algorithm', name: '抽取算法', version: '26.6.16', type: 'core', description: '概率计算与座位分配算法', init() {}, destroy() {} });
     ModuleRegistry.register({ id: 'core-eval', name: '综合评价引擎', version: '1.0.0', type: 'core', description: '多维度学生能力评估系统', init() {}, destroy() {} });
     ModuleRegistry.register({ id: 'core-security', name: '安全沙箱', version: '1.0.0', type: 'core', description: '插件安全检测与权限管理', init() {}, destroy() {} });
-    ModuleRegistry.register({ id: 'panel-ui', name: '用户操作面板', version: '6.0.0', type: 'panel', description: '主界面渲染与交互处理', init() {}, destroy() {} });
+    ModuleRegistry.register({ id: 'panel-ui', name: '用户操作面板', version: '26.6.16', type: 'panel', description: '主界面渲染与交互处理', init() {}, destroy() {} });
     ModuleRegistry.register({ id: 'panel-management', name: '管理面板', version: '1.0.0', type: 'panel', description: '模块管理、健康监控、主题仓库', init() {}, destroy() {} });
     ModuleRegistry.register({ id: 'plugin-manager', name: '插件管理器', version: '1.0.0', type: 'core', description: '插件注册、安全检测、生命周期管理', init() {}, destroy() {} });
     ModuleRegistry.register({ id: 'theme-repo', name: '主题仓库', version: '1.0.0', type: 'panel', description: '多套视觉方案管理与切换', init() {}, destroy() {} });

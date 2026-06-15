@@ -266,7 +266,7 @@ permissions: ['core.read', 'data.students', 'ui.toast']
 // ==================== Module Registry & Version Control ====================
 const ModuleRegistry = {
     modules: new Map(),
-    systemVersion: '5.0.0',
+    systemVersion: '26.6.16',
 
     register(mod) {
         if (!mod.id || !mod.version) {
